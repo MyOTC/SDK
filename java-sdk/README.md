@@ -30,9 +30,8 @@ https://github.com/MyOTC/API-Doc
 
 3.创建相应的OrderContoller:
 
-生产环境网关：https://gatway.pingpay.co
+生产环境网关：https://gateway.pingpay.co
 
-测试环境网关：http://gateway.dragonscam.me
 ```
 @Controller
 @Slf4j
@@ -41,14 +40,14 @@ public class OrderController {
     //在商家API设置页面设置的密钥，在回调地址下面
     private static OrderNotifyService orderNotifyService = new OrderNotifyService("回调设置的密钥");
    
-    private static OrderService orderService = new OrderService("Access Key","Access SecretKey", "http://gateway.dragonscam.me");
+    private static OrderService orderService = new OrderService("Access Key","Access SecretKey", "https://gateway.pingpay.co");
 
 
     @RequestMapping(path = "/createOrder")
     public String createOrder() {
 
         try{
-//            OrderService orderService = new OrderService("7fvgcc1d-dle8q17l-dmhzlqyw-y1542","7yydobhg-cb8lv3dr-erqvxpoc-g7434","http://gateway.dragonscam.me");
+//            OrderService orderService = new OrderService("Access Key","Access SecretKey","https://gateway.pingpay.co");
 //            log.info("currency={}", request.getCurrency());
             GatewayBuyOrderRequest request = new GatewayBuyOrderRequest();
             request.setVariety("USDT");
@@ -58,7 +57,7 @@ public class OrderController {
             request.setIdNumber("522636199309273271");
             request.setOutUid("1");
             request.setName("张三");
-            request.setCallback("http://localhost:8081/v1/api0/demo/callback");//对应下面同步回调方法的地址
+            request.setCallback("http://localhost:8081/v1/api0/demo/callback");//对应下面同步回调方法的地址,开发者换成自己的地址
             return "redirect:" + orderService.buyUrl(request);
 
         }catch (Exception e){
