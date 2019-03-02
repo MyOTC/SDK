@@ -4,16 +4,19 @@ API文档请访问:
 https://github.com/MyOTC/API-Doc
 
 订单相关操作:com.bdd.service.OrderService
+
 订单通知:com.bdd.service.OrderNotifyService
 
 使用方法:
 
-1.使用maven package 后会生成如下三个jar包 
+1. 先git clone 到本地，使用maven package 后会生成如下三个jar包 
+```
     bdd-java-sdk-1.0.jar
     bdd-java-sdk-1.0-sources.jar(源码包) 
     bdd-java-sdk-1.0-jar-with-dependencies.jar(带依赖的jar:避免与您项目依赖jar版本差异而无法运行的情况)
-    
-2.将jar包放在您项目libs目录下,maven 中添加如下内容:
+ ```
+2. 在您的根目录下新建libs文件夹，将jar包放在您项目libs目录下,maven 中添加如下内容:
+```
    <dependency>
       <groupId>com.bdd</groupId>
       <artifactId>bdd-java-sdk</artifactId>
@@ -22,6 +25,79 @@ https://github.com/MyOTC/API-Doc
       <systemPath>${project.basedir}/libs/bdd-java-sdk-1.0.jar</systemPath>
       <!--<systemPath>${project.basedir}/libs/bdd-java-sdk-1.0-jar-with-dependencies.jar</systemPath>-->
      </dependency>
-     
-3.创建相应的service:
-     private static OrderService orderService = new OrderService("Access Key","Access Secret","http://gateway.dragonscam.me");
+
+```
+
+3.创建相应的OrderContoller:
+
+生产环境网关：https://gatway.pingpay.co
+
+测试环境网关：http://gateway.dragonscam.me
+```
+@Controller
+@Slf4j
+public class OrderController {
+
+    //在商家API设置页面设置的密钥，在回调地址下面
+    private static OrderNotifyService orderNotifyService = new OrderNotifyService("回调设置的密钥");
+   
+    private static OrderService orderService = new OrderService("Access Key","Access SecretKey", "http://gateway.dragonscam.me");
+
+
+    @RequestMapping(path = "/createOrder")
+    public String createOrder() {
+
+        try{
+//            OrderService orderService = new OrderService("7fvgcc1d-dle8q17l-dmhzlqyw-y1542","7yydobhg-cb8lv3dr-erqvxpoc-g7434","http://gateway.dragonscam.me");
+//            log.info("currency={}", request.getCurrency());
+            GatewayBuyOrderRequest request = new GatewayBuyOrderRequest();
+            request.setVariety("USDT");
+            request.setAmount("100");
+            request.setOutOrderSn(String.valueOf(new Date().getTime()));
+            request.setCurrency("CNY");
+            request.setIdNumber("522636199309273271");
+            request.setOutUid("1");
+            request.setName("张三");
+            request.setCallback("http://localhost:8081/v1/api0/demo/callback");//对应下面同步回调方法的地址
+            return "redirect:" + orderService.buyUrl(request);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 同步回调
+     */
+    @RequestMapping("/v1/api0/demo/callback")
+    public String buyCallback(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        checkIsDebug();
+
+        BuyOrderSyncMessage buyOrderSyncMessage;
+        try {
+            buyOrderSyncMessage = orderNotifyService.buyCallback(request.getRequestURL().toString(),request.getQueryString(),null);
+        } catch (Exception e) {
+            return print(response, e.getMessage());
+        }
+        if (!"1".equals(buyOrderSyncMessage.getResult())) {
+            return print(response, buyOrderSyncMessage.getMsg());
+        }
+        //发起付款
+        GatewayBuyOrderConfirmPayRequest gatewayBuyOrderConfirmPayRequest = new GatewayBuyOrderConfirmPayRequest();
+        gatewayBuyOrderConfirmPayRequest.setOutOrderSn(buyOrderSyncMessage.getOutOrderSn());
+        return "redirect:" + orderService.confirmPayUrl(gatewayBuyOrderConfirmPayRequest);
+    }
+
+    private String print(HttpServletResponse response,String msg) throws IOException {
+        response.setStatus(HttpStatus.OK.value());
+        response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Cache-Control", "no-cache, must-revalidate");
+        PrintWriter writer = response.getWriter();
+        writer.write(msg);
+        return null;
+    }
+}
+
+```
