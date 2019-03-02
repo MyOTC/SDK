@@ -1,7 +1,7 @@
-BDD-JAVA-SDK 
+PingPay-JAVA-SDK 
 
 API文档请访问:
-https://github.com/bddpay/APIDOC/wiki
+https://github.com/MyOTC/API-Doc
 
 订单相关操作:com.bdd.service.OrderService
 订单通知:com.bdd.service.OrderNotifyService
@@ -21,4 +21,4 @@ https://github.com/bddpay/APIDOC/wiki
       <!--<systemPath>${project.basedir}/libs/bdd-java-sdk-1.0-jar-with-dependencies.jar</systemPath>-->
      </dependency>
 3.创建相应的service:
-     private static OrderService orderService = new OrderService("mqqzc2lm-qomnzbj1-5zpihc19-n2743","pcezw3lb-oaro4yfi-oy6h7vzs-s0536","http://merchant.rmmlm.com");
+     private static OrderService orderService = new OrderService("Access Key","Access Secret","http://gateway.dragonscam.me");
