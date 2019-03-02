@@ -33,7 +33,7 @@ try{
         '6225880100000000',
         $order_no,
         '3',
-        'http://localhost/pingpay_php_sdk/demo/callback.php',
+        'http://localhost/php_sdk/demo/callback.php',
         '张三'
     );
 
