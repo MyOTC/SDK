@@ -40,7 +40,7 @@ public class OrderController {
     //在商家API设置页面设置的密钥
     private static OrderNotifyService orderNotifyService = new OrderNotifyService("回调密钥");
    
-    private static OrderService orderService = new OrderService("Access Key","AccessKey Secret", "https://gateway.pingpay.co");
+    private static OrderService orderService = new OrderService("AccessKey","AccessKey Secret", "https://gateway.pingpay.co");
 
 
     @RequestMapping(path = "/demo/createOrder")
